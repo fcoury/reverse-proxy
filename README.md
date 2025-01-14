@@ -8,6 +8,7 @@ This project is a **Reverse Proxy** built in Rust 🦀 using the [Pingora](https
 - **⚡ Rate Limiting:** Enforces limits per app ID.
 - **📡 Upstream Health Checks:** Periodic TCP health checks.
 - **🔌 Custom Request Filters:** Filters and modifies incoming and outgoing requests.
+- **📝 Logging-Only Servers:** Designate servers to receive all requests but only log the responses.
 
 ## Getting Started
 
@@ -61,6 +62,10 @@ curl 127.0.0.1:6188 -svo /dev/null
    - Adds/Modifies headers for requests sent to upstreams.
    - Validates incoming requests using custom logic.
 
+4. **Logging-Only Servers**
+   - Designate one server as the active server and others as logging-only servers.
+   - Logging-only servers receive all requests but only log the responses without sending them back to the client.
+
 ### Key Components
 
 - **`main.rs`**: Entry point of the application.
@@ -81,6 +86,14 @@ curl 127.0.0.1:6188 -svo /dev/null
 
   ```rust
   pub static MAX_REQ_PER_SEC: isize = 1;
+  ```
+
+- **Active and Logging-Only Servers**:
+  Designate one server as the active server and others as logging-only servers in the `main.rs` file:
+
+  ```rust
+  let active_server = "1.1.1.1:443".to_string();
+  let logging_only_servers = vec!["1.0.0.1:443".to_string(), "127.0.0.1:343".to_string()];
   ```
 
 ## Contributing

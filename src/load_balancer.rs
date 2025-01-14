@@ -10,7 +10,10 @@ use std::sync::Arc;
 
 use crate::rate_limiter::{RATE_LIMITER, MAX_REQ_PER_SEC};
 
-pub struct LB(pub Arc<LoadBalancer<RoundRobin>>);
+pub struct LB {
+    pub load_balancer: Arc<LoadBalancer<RoundRobin>>,
+    pub active_server: String,
+}
 
 impl LB {
     pub fn get_request_appid(&self, session: &mut Session) -> Option<String> {
@@ -37,7 +40,7 @@ impl ProxyHttp for LB {
     }
 
     async fn upstream_peer(&self, _session: &mut Session, _ctx: &mut Self::CTX) -> Result<Box<HttpPeer>> {
-        let upstream = self.0.select(b"", 256).unwrap();
+        let upstream = self.load_balancer.select(b"", 256).unwrap();
         println!("upstream peer is: {upstream:?}");
         
         let peer = Box::new(HttpPeer::new(upstream, true, "one.one.one.one".to_string()));
